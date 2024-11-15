@@ -73,7 +73,7 @@ router.delete('/deleteStar/:id', async (req, res) => {
 // get a star by his id
 router.get('/getStar/:id', async (req, res) => {
     try {
-        myid = req.params.id
+        myid = req.params.id;
         star = await Star.findById({ _id: myid })
         res.status(200).send(star)
 
@@ -105,6 +105,18 @@ router.put('/updateStar/:id', upload.any('image'), async (req, res) => {
         res.status(400).send(err)
     }
 })
+ // Update the star without checking for image
+router.put('/StarUpdate/:id', async (req, res) => {
+    try {
+        const myid = req.params.id;
+        let newData = req.body;
+        
+        const updated = await Star.findByIdAndUpdate({ _id: myid }, newData, { new: true });
+        res.status(200).send(updated);
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
 
 
 

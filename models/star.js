@@ -23,7 +23,8 @@ const Star = mongoose.model('Star', {
         type: Date
     },
     comments : {
-        type : Array
+        type: mongoose.Schema.Types.ObjectId,
+            ref: 'Comment',
     },
     category : {
         type: String
