@@ -93,7 +93,19 @@ router.get('/getUserByid/:id' , async(req , res)=>{
         
     }
 })
-
+//update user
+router.put('/userUpdate/:id', async (req, res) => {
+    try {
+        const myid = req.params.id;
+        let newData = req.body;
+         salt = bcrypt.genSaltSync(10);
+        newData.password = bcrypt.hashSync(newData.password, salt);
+        const updated = await User.findByIdAndUpdate({ _id: myid }, newData, { new: true });
+        res.status(200).send(updated);
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
 //Delete user 
 router.delete('/deleteid/:id' ,  async (req , res)=> {
     try {

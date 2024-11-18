@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Star = require('../models/star');
+const Comment = require('../models/Comment');
 const multer = require('multer');
 
 
@@ -117,6 +118,37 @@ router.put('/StarUpdate/:id', async (req, res) => {
         res.status(400).send(err);
     }
 });
+//add comment to a star 
+router.post('/addCommentToStar/:ids', async (req, res) => {
+    try {
+        const starId = req.params.ids;  
+        const commentData = req.body;     
+
+        // Ensure commentData contains both username and message
+        if (!commentData.username || !commentData.message) {
+            return res.status(400).send('Both username and message are required for the comment');
+        }
+
+        const comment = new Comment(commentData);  
+        const savedComment = await comment.save();  
+
+        const star = await Star.findById(starId);  
+        if (!star) {
+            return res.status(404).send('Star not found');
+        }
+        if (!star.comments) {
+            star.comments = [];
+        }
+        star.comments.push(savedComment._id); 
+        await star.save(); 
+
+        res.status(200).send(star);  // Respond with the updated Star
+    } catch (error) {
+        console.error("Error:", error);  // Log any errors that occur
+        res.status(400).send({ message: 'Error adding comment to the star', error: error.message });
+    }
+});
+
 
 
 

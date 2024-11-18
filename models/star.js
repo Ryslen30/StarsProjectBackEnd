@@ -22,10 +22,13 @@ const Star = mongoose.model('Star', {
     dateDeFormation : {
         type: Date
     },
-    comments : {
+    comments : [
+        {
         type: mongoose.Schema.Types.ObjectId,
             ref: 'Comment',
-    },
+            default: [],
+        }
+    ],
     category : {
         type: String
     },
