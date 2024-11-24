@@ -95,18 +95,43 @@ router.delete('/deleteid/:id' ,  async (req , res)=> {
 });
 
 //Update admin
+
+
 router.put('/adminUpdate/:id', async (req, res) => {
     try {
         const myid = req.params.id;
-        let newData = req.body;
-         salt = bcrypt.genSaltSync(10);
-        newData.password = bcrypt.hashSync(newData.password, salt);
-        const updated = await Admin.findByIdAndUpdate({ _id: myid }, newData, { new: true });
-        res.status(200).send(updated);
+        const { currentPassword, newPassword } = req.body;
+
+        // Fetch the admin by ID
+        const admin = await Admin.findById(myid);
+
+        if (!admin) {
+            return res.status(404).send({ message: 'Admin not found' });
+        }
+         
+
+        // Compare current password with hashed password in the database
+        const isPasswordValid = await bcrypt.compare(currentPassword, admin.password);
+
+        if (!isPasswordValid) {
+            return res.status(400).send({ message: 'Current password is incorrect' });
+        }
+
+        // Hash the new password
+        const salt = bcrypt.genSaltSync(10);
+        const hashedNewPassword = bcrypt.hashSync(newPassword, salt);
+
+        // Update the password
+        admin.password = hashedNewPassword;
+
+        const updated = await admin.save();
+        return res.status(200).send({ message: 'Password updated successfully', updated });
+
     } catch (err) {
-        res.status(400).send(err);
+        console.error(err);
+        return res.status(500).send({ message: 'An error occurred', error: err.message });
     }
-}
-);
+});
+
 
 module.exports = router ;
