@@ -3,19 +3,19 @@ const mongoose = require('mongoose');
 const Admin = mongoose.model('Admin', {
     username : {
         type: String,
-        required: true
+        required: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
     },
     password : {
         type: String,
-        required: true
-    },
-    photo : {
-        type: String,
-        required: true
+        required: true,
     },
     email : {
         type: String,
-        required: true
+        required: true,
     },
  });
  module.exports = Admin;

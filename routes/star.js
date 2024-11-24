@@ -28,7 +28,6 @@ router.post('/create', upload.any('photo'), async (req, res) => { //any : nombre
         star = new Star(data);
         star.dateDeFormation = new Date();
         star.photo = filename;
-        star.comments = data.comments.split(',');
         savedStar = await star.save();
         filename = '';
         res.status(200).send(savedStar);
@@ -85,34 +84,42 @@ router.get('/getStar/:id', async (req, res) => {
 
 // Updating a Star
 
-router.put('/updateStar/:id', upload.any('image'), async (req, res) => {
-    try {
-        myid = req.params.id
-        newData = req.body
-    // si on a modifier les commentaires
-        if (newData.comments) {
-            newData.comments = newData.comments.split(',');
-        }
-    //si on a modifier l'image de Star
-        if (req.files && req.files.length > 0) {
-            filename = req.files[0].filename;
-            newData.photo = filename;
-        }
-        updated = await Star.findByIdAndUpdate({ _id: myid }, newData, { new: true })
-        filename = '';
-        res.status(200).send(updated)
-    }
-    catch (err) {
-        res.status(400).send(err)
-    }
-})
+// router.put('/updateStar/:id', upload.any('image'), async (req, res) => {
+//     try {
+//         myid = req.params.id
+//         newData = req.body
+//     // si on a modifier les commentaires
+//         if (newData.comments) {
+//             newData.comments = newData.comments.split(',');
+//         }
+//     //si on a modifier l'image de Star
+//         if (req.files && req.files.length > 0) {
+//             filename = req.files[0].filename;
+//             newData.photo = filename;
+//         }
+//         updated = await Star.findByIdAndUpdate({ _id: myid }, newData, { new: true })
+//         filename = '';
+//         res.status(200).send(updated)
+//     }
+//     catch (err) {
+//         res.status(400).send(err)
+//     }
+// })
  // Update the star without checking for image
-router.put('/StarUpdate/:id', async (req, res) => {
+router.put('/StarUpdate/:id', upload.any('image') , async (req, res) => {
     try {
         const myid = req.params.id;
         let newData = req.body;
-        
+        if (newData.comments) {
+        newData.comments = newData.comments.split(',');
+        }
+        if (req.files && req.files.length > 0) {
+             filename = req.files[0].filename;
+       
+            newData.photo = filename;
+                    }
         const updated = await Star.findByIdAndUpdate({ _id: myid }, newData, { new: true });
+        filename = '';
         res.status(200).send(updated);
     } catch (err) {
         res.status(400).send(err);
@@ -148,6 +155,27 @@ router.post('/addCommentToStar/:ids', async (req, res) => {
         res.status(400).send({ message: 'Error adding comment to the star', error: error.message });
     }
 });
+router.delete('/:ids/deleteComment/:id', async (req,res)=>{
+    try {
+        const commentId = req.params.id;
+        const starId = req.params.ids;
+        const star = await Star.findById(starId); 
+        if (!star) {
+            return res.status(404).send('Star not found');
+        }
+        const commentIndex = star.comments.indexOf(commentId);
+        if (commentIndex === -1) {
+            return res.status(404).send('Comment not found in the star');
+        }
+        star.comments.splice(commentIndex, 1);
+        await star.save();
+        res.status(200).send(star);
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(400).send({ message: 'Error deleting comment from the star', error: error.message });
+    }
+
+})
 
 
 

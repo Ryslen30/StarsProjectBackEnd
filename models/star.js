@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const Star = mongoose.model('Star', {
-
-    id : {
-        type: String,
-        unique : true
-    },
     name : {
         type: String
     },

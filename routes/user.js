@@ -105,7 +105,8 @@ router.put('/userUpdate/:id', async (req, res) => {
     } catch (err) {
         res.status(400).send(err);
     }
-});
+}
+);
 //Delete user 
 router.delete('/deleteid/:id' ,  async (req , res)=> {
     try {
